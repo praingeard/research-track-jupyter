@@ -21,6 +21,7 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib_msgs/GoalID.h>
+#include <std_msgs/Bool.h>
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient; ///<Move Base Client.
 
@@ -29,7 +30,9 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "move_base_position_node");
     ros::NodeHandle nh;
     ros::Publisher pub;
+    ros::Publisher pub_bool;
     pub = nh.advertise<actionlib_msgs::GoalID>("move_base/cancel", 1);
+    pub_bool = nh.advertise<std_msgs::Bool>("reached_targets", 1);
 
     //tell the action client that we want to spin a thread by default
     MoveBaseClient ac("move_base", true);
@@ -77,22 +80,33 @@ int main(int argc, char **argv)
         ROS_INFO("Sending goal");
         ac.sendGoal(goal);
         ROS_INFO("goal sent");
+        
+        std_msgs::Bool msg_bool = std_msgs::Bool();
 
         bool finished_before_timeout = ac.waitForResult(ros::Duration(30.0));
+           
 
         //get state is robot has arrived
         if (finished_before_timeout)
         {
-            if (ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+            if (ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
                 ROS_INFO("Hooray, the base moved to your goal");
-            else
+                msg_bool.data = true;
+                pub_bool.publish(msg_bool);
+            }
+            else{
                 ROS_INFO("The base failed to move to the goal for some reason");
+                 msg_bool.data = false;
+                pub_bool.publish(msg_bool);
+            }
         }
         //tell user that timeout has finished and cancel goal
         else
         {
             ROS_INFO("Timeout exceeded, canceling goal");
             auto msg = actionlib_msgs::GoalID();
+            msg_bool.data = false;
+            pub_bool.publish(msg_bool);
             pub.publish(msg);
         }
     }

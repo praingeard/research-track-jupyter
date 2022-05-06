@@ -28,7 +28,7 @@ generate_messages(
   std_msgs
 )
 
-catkin_package()
+catkin_package(CATKIN_DEPENDS std_msgs message_runtime)
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
@@ -50,6 +50,9 @@ target_link_libraries(angle_filter ${catkin_LIBRARIES})
 target_link_libraries(control ${catkin_LIBRARIES})
 target_link_libraries(move_base_position ${catkin_LIBRARIES})
 target_link_libraries(ui ${catkin_LIBRARIES})
+
+
+add_dependencies(ui ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
  install(FILES

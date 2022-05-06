@@ -72,8 +72,9 @@ void scanCallback(const sensor_msgs::LaserScan &msg)
     }
 
     //update scan message with new values
+    int minElementIndex = std::min_element(ranges.begin(),ranges.end()) - ranges.begin(); 
     new_scan.header = msg.header;
-    new_scan.angle_min = min_angle_scan;
+    new_scan.angle_min = min_angle_scan + minElementIndex*increment;
     new_scan.angle_max = max_angle_scan;
     new_scan.angle_increment = increment;
     new_scan.range_min = *std::min_element(ranges.begin(), ranges.end());

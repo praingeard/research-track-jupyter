@@ -16,6 +16,11 @@
       <param name="min_angle" value="-0.7"/>
       <param name="max_angle" value="0.7"/>
     </node>
+     <node pkg="robot_control_final_assignment" type="angle_filter" name="scan_general_node" output="screen">
+      <param name="scan_topic" value="scan_general"/>
+      <param name="min_angle" value="-1.57"/>
+      <param name="max_angle" value="1.57"/>
+    </node>
     <node pkg="robot_control_final_assignment" type="ui" name="ui_node" output="screen">
     </node>
 </launch>
